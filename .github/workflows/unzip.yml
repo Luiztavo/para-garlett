@@ -1,0 +1,27 @@
+name: Unzip upload package
+on:
+  push:
+    paths:
+      - para-garlett-github.zip
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract package
+        run: |
+          unzip -o para-garlett-github.zip
+          rm para-garlett-github.zip
+          rm -f .github/workflows/unzip.yml
+          find . -maxdepth 2 -not -path './.git*' | sort
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Upload gift page files" || echo "nothing to commit"
+          git push
