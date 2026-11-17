@@ -1,0 +1,26 @@
+name: Move site to repo root
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move github-pages contents to root
+        run: |
+          shopt -s dotglob
+          mv github-pages/* .
+          rmdir github-pages
+          rm -f .github/workflows/move-to-root.yml
+          ls -la
+          ls assets | wc -l
+      - name: Commit moved files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Move gift page files to repo root" || echo "nothing to commit"
+          git push
